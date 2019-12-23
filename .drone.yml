@@ -129,3 +129,20 @@ trigger:
 
 depends_on:
   - testing
+
+
+---
+kind: pipeline
+name: run myself
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: upx
+    image: cnbattle/drone-upx
+    settings:
+      level: 9
+      save_file: ./release/linux/amd64/drone-upx-new
+      original_file: ./release/linux/amd64/drone-upx
