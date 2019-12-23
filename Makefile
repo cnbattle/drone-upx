@@ -117,22 +117,6 @@ endif
 	docker tag $(DEPLOY_ACCOUNT)/$(DEPLOY_IMAGE):latest $(DEPLOY_ACCOUNT)/$(DEPLOY_IMAGE):$(tag)
 	docker push $(DEPLOY_ACCOUNT)/$(DEPLOY_IMAGE):$(tag)
 
-ssh-server:
-	adduser -h /home/drone-scp -s /bin/bash -D -S drone-scp
-	echo drone-scp:1234 | chpasswd
-	mkdir -p /home/drone-scp/.ssh
-	chmod 700 /home/drone-scp/.ssh
-	cp tests/.ssh/id_rsa.pub /home/drone-scp/.ssh/authorized_keys
-	chown -R drone-scp /home/drone-scp/.ssh
-	# install ssh and start server
-	apk add --update openssh openrc
-	rm -rf /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_dsa_key
-	sed -i 's/AllowTcpForwarding no/AllowTcpForwarding yes/g' /etc/ssh/sshd_config
-	./tests/entrypoint.sh /usr/sbin/sshd -D &
-
-coverage:
-	sed -i '/main.go/d' coverage.txt
-
 clean:
 	$(GO) clean -x -i ./...
 	rm -rf coverage.txt $(EXECUTABLE) $(DIST)
