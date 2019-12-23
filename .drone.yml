@@ -41,7 +41,7 @@ steps:
       - apk add git make curl perl bash build-base zlib-dev ucl-dev
 #      - make ssh-server
       - make test
-      - make coverage
+#      - make coverage
     volumes:
       - name: gopath
         path: /go
