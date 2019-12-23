@@ -46,13 +46,86 @@ steps:
       - name: gopath
         path: /go
 
-#  - name: codecov
-#    pull: always
-#    image: robertstettner/drone-codecov
-#    settings:
-#      token:
-#        from_secret: codecov_token
-
 volumes:
   - name: gopath
     temp: {}
+
+
+---
+kind: pipeline
+name: linux-amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: build-push
+    pull: always
+    image: golang:1.13
+    commands:
+      - go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-upx
+    environment:
+      CGO_ENABLED: 0
+    when:
+      event:
+        exclude:
+          - tag
+
+  - name: build-tag
+    pull: always
+    image: golang:1.13
+    commands:
+      - go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-upx
+    environment:
+      CGO_ENABLED: 0
+    when:
+      event:
+        - tag
+
+  - name: executable
+    pull: always
+    image: golang:1.13
+    commands:
+      - ./release/linux/amd64/drone-upx
+
+  - name: dryrun
+    pull: always
+    image: plugins/docker:linux-amd64
+    settings:
+      cache_from: cnbattle/drone-upx
+      dockerfile: Dockerfile
+      dry_run: true
+      repo: cnbattle/drone-upx
+      tags: linux-amd64
+    when:
+      event:
+        - pull_request
+
+  - name: publish
+    pull: always
+    image: plugins/docker:linux-amd64
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-amd64
+      cache_from: cnbattle/drone-upx
+      daemon_off: false
+      dockerfile: Dockerfile
+      password:
+        from_secret: docker_password
+      repo: cnbattle/drone-upx
+      username:
+        from_secret: docker_username
+    when:
+      event:
+        exclude:
+          - pull_request
+
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/pull/**
+    - refs/tags/**
+
+depends_on:
+  - testing
