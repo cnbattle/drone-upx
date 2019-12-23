@@ -141,7 +141,7 @@ platform:
 
 steps:
   - name: upx
-    image: cnbattle/drone-upx
+    image: cnbattle/drone-upx:linux-amd64
     settings:
       level: 9
       save_file: ./release/linux/amd64/drone-upx-new
