@@ -3,5 +3,5 @@ FROM plugins/base:linux-arm64
 RUN apk add --no-cache ca-certificates && \
   rm -rf /var/cache/apk/*
 
-COPY release/linux/arm64/drone-scp /bin/
-ENTRYPOINT ["/bin/drone-scp"]
+COPY release/linux/arm64/drone-upx /bin/
+ENTRYPOINT ["/bin/drone-upx"]
