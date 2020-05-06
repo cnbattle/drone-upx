@@ -36,7 +36,7 @@ steps:
 
   - name: test
     pull: always
-    image: golang:1.14-alpine
+    image: golang:1.14
     commands:
       - make test
     volumes:
