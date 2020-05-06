@@ -1,0 +1,5 @@
+FROM microsoft/nanoserver:10.0.14393.1884
+
+COPY drone-scp.exe /drone-scp.exe
+
+ENTRYPOINT [ "\\drone-scp.exe" ]

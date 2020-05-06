@@ -9,39 +9,36 @@ platform:
 steps:
   - name: vet
     pull: always
-    image: golang:1.13
+    image: golang:1.14
     commands:
       - make vet
     volumes:
       - name: gopath
         path: /go
 
-#  - name: lint
-#    pull: always
-#    image: golang:1.13
-#    commands:
-#      - make lint
-#    volumes:
-#      - name: gopath
-#        path: /go
+  - name: lint
+    pull: always
+    image: golang:1.14
+    commands:
+      - make lint
+    volumes:
+      - name: gopath
+        path: /go
 
-#  - name: misspell
-#    pull: always
-#    image: golang:1.13
-#    commands:
-#      - make misspell-check
-#    volumes:
-#      - name: gopath
-#        path: /go
+  - name: misspell
+    pull: always
+    image: golang:1.14
+    commands:
+      - make misspell-check
+    volumes:
+      - name: gopath
+        path: /go
 
   - name: test
     pull: always
-    image: golang:1.13-alpine
+    image: golang:1.14-alpine
     commands:
-      - apk add git make curl perl bash build-base zlib-dev ucl-dev
-#      - make ssh-server
       - make test
-#      - make coverage
     volumes:
       - name: gopath
         path: /go
@@ -49,7 +46,6 @@ steps:
 volumes:
   - name: gopath
     temp: {}
-
 
 ---
 kind: pipeline
@@ -62,9 +58,9 @@ platform:
 steps:
   - name: build-push
     pull: always
-    image: golang:1.13
+    image: golang:1.14
     commands:
-      - go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-upx
+      - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-upx"
     environment:
       CGO_ENABLED: 0
     when:
@@ -74,9 +70,9 @@ steps:
 
   - name: build-tag
     pull: always
-    image: golang:1.13
+    image: golang:1.14
     commands:
-      - go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-upx
+      - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-upx"
     environment:
       CGO_ENABLED: 0
     when:
@@ -85,16 +81,16 @@ steps:
 
   - name: executable
     pull: always
-    image: golang:1.13
+    image: golang:1.14
     commands:
-      - ./release/linux/amd64/drone-upx
+      - ./release/linux/amd64/drone-upx --help
 
   - name: dryrun
     pull: always
     image: plugins/docker:linux-amd64
     settings:
       cache_from: cnbattle/drone-upx
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.linux.amd64
       dry_run: true
       repo: cnbattle/drone-upx
       tags: linux-amd64
@@ -110,7 +106,7 @@ steps:
       auto_tag_suffix: linux-amd64
       cache_from: cnbattle/drone-upx
       daemon_off: false
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.linux.amd64
       password:
         from_secret: docker_password
       repo: cnbattle/drone-upx
@@ -124,25 +120,236 @@ steps:
 trigger:
   ref:
     - refs/heads/master
-    - refs/pull/**
-    - refs/tags/**
+    - "refs/pull/**"
+    - "refs/tags/**"
 
 depends_on:
   - testing
 
+---
+kind: pipeline
+name: linux-arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+  - name: build-push
+    pull: always
+    image: golang:1.14
+    commands:
+      - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-upx"
+    environment:
+      CGO_ENABLED: 0
+    when:
+      event:
+        exclude:
+          - tag
+
+  - name: build-tag
+    pull: always
+    image: golang:1.14
+    commands:
+      - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-upx"
+    environment:
+      CGO_ENABLED: 0
+    when:
+      event:
+        - tag
+
+  - name: executable
+    pull: always
+    image: golang:1.14
+    commands:
+      - ./release/linux/arm64/drone-upx --help
+
+  - name: dryrun
+    pull: always
+    image: plugins/docker:linux-arm64
+    settings:
+      cache_from: cnbattle/drone-upx
+      dockerfile: docker/Dockerfile.linux.arm64
+      dry_run: true
+      repo: cnbattle/drone-upx
+      tags: linux-arm64
+    when:
+      event:
+        - pull_request
+
+  - name: publish
+    pull: always
+    image: plugins/docker:linux-arm64
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-arm64
+      cache_from: cnbattle/drone-upx
+      daemon_off: false
+      dockerfile: docker/Dockerfile.linux.arm64
+      password:
+        from_secret: docker_password
+      repo: cnbattle/drone-upx
+      username:
+        from_secret: docker_username
+    when:
+      event:
+        exclude:
+          - pull_request
+
+trigger:
+  ref:
+    - refs/heads/master
+    - "refs/pull/**"
+    - "refs/tags/**"
+
+depends_on:
+  - testing
 
 ---
 kind: pipeline
-name: run myself
+name: linux-arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+  - name: build-push
+    pull: always
+    image: golang:1.14
+    commands:
+      - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-upx"
+    environment:
+      CGO_ENABLED: 0
+    when:
+      event:
+        exclude:
+          - tag
+
+  - name: build-tag
+    pull: always
+    image: golang:1.14
+    commands:
+      - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-upx"
+    environment:
+      CGO_ENABLED: 0
+    when:
+      event:
+        - tag
+
+  - name: executable
+    pull: always
+    image: golang:1.14
+    commands:
+      - ./release/linux/arm/drone-upx --help
+
+  - name: dryrun
+    pull: always
+    image: plugins/docker:linux-arm
+    settings:
+      cache_from: cnbattle/drone-upx
+      dockerfile: docker/Dockerfile.linux.arm
+      dry_run: true
+      repo: cnbattle/drone-upx
+      tags: linux-arm
+    when:
+      event:
+        - pull_request
+
+  - name: publish
+    pull: always
+    image: plugins/docker:linux-arm
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-arm
+      cache_from: cnbattle/drone-upx
+      daemon_off: false
+      dockerfile: docker/Dockerfile.linux.arm
+      password:
+        from_secret: docker_password
+      repo: cnbattle/drone-upx
+      username:
+        from_secret: docker_username
+    when:
+      event:
+        exclude:
+          - pull_request
+
+trigger:
+  ref:
+    - refs/heads/master
+    - "refs/pull/**"
+    - "refs/tags/**"
+
+depends_on:
+  - testing
+
+---
+kind: pipeline
+name: release-binary
 
 platform:
   os: linux
   arch: amd64
 
 steps:
-  - name: upx
-    image: cnbattle/drone-upx:linux-amd64
+  - name: build-all-binary
+    pull: always
+    image: golang:1.14
+    commands:
+      - make release
+    when:
+      event:
+        - tag
+
+  - name: deploy-all-binary
+    pull: always
+    image: plugins/github-release
     settings:
-      level: 9
-      save_file: ./release/linux/amd64/drone-upx-new
-      original_file: ./release/linux/amd64/drone-upx
+      api_key:
+        from_secret: github_release_api_key
+      files:
+        - "dist/release/*"
+    when:
+      event:
+        - tag
+
+trigger:
+  ref:
+    - "refs/tags/**"
+
+depends_on:
+  - testing
+
+---
+kind: pipeline
+name: notifications
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: manifest
+    pull: always
+    image: plugins/manifest
+    settings:
+      ignore_missing: true
+      password:
+        from_secret: docker_password
+      spec: docker/manifest.tmpl
+      username:
+        from_secret: docker_username
+
+trigger:
+  ref:
+    - refs/heads/master
+    - "refs/tags/**"
+
+depends_on:
+  - linux-amd64
+  - linux-arm64
+  - linux-arm
+  - release-binary
+
+...

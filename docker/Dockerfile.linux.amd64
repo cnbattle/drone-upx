@@ -1,0 +1,7 @@
+FROM plugins/base:linux-amd64
+
+RUN apk add --no-cache ca-certificates && \
+  rm -rf /var/cache/apk/*
+
+COPY release/linux/amd64/drone-scp /bin/
+ENTRYPOINT ["/bin/drone-scp"]
