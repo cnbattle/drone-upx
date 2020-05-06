@@ -6,6 +6,7 @@ import (
 	"os/exec"
 )
 
+// Cmd Cmd
 func Cmd(name string, arg ...string) {
 	fmt.Println(name, arg)
 	cmd0 := exec.Command(name, arg...)
