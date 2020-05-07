@@ -10,7 +10,8 @@ var (
 	level        string
 	saveFile     string
 	originalFile string
-	Version      string
+	// Version Version
+	Version string
 )
 
 func init() {
