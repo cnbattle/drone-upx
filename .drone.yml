@@ -146,7 +146,7 @@ steps:
     pull: always
     image: golang:1.14
     commands:
-      - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-upx-original"
+      - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-upx"
     environment:
       CGO_ENABLED: 0
     when:
@@ -158,19 +158,19 @@ steps:
     pull: always
     image: golang:1.14
     commands:
-      - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-upx-original"
+      - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-upx"
     environment:
       CGO_ENABLED: 0
     when:
       event:
         - tag
 
-  - name : upx
-    image: cnbattle/drone-upx
-    settings:
-      level: 9
-      save_file: ./release/linux/arm64/drone-upx
-      original_file: ./release/linux/arm64/drone-upx-original
+#  - name : upx
+#    image: cnbattle/drone-upx
+#    settings:
+#      level: 9
+#      save_file: ./release/linux/arm64/drone-upx
+#      original_file: ./release/linux/arm64/drone-upx-original
 
   - name: executable
     pull: always
@@ -232,7 +232,7 @@ steps:
     pull: always
     image: golang:1.14
     commands:
-      - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-upx-original"
+      - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-upx"
     environment:
       CGO_ENABLED: 0
     when:
@@ -244,19 +244,19 @@ steps:
     pull: always
     image: golang:1.14
     commands:
-      - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-upx-original"
+      - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-upx"
     environment:
       CGO_ENABLED: 0
     when:
       event:
         - tag
 
-  - name : upx
-    image: cnbattle/drone-upx
-    settings:
-      level: 9
-      save_file: ./release/linux/arm/drone-upx
-      original_file: ./release/linux/arm/drone-upx-original
+#  - name : upx
+#    image: cnbattle/drone-upx
+#    settings:
+#      level: 9
+#      save_file: ./release/linux/arm/drone-upx
+#      original_file: ./release/linux/arm/drone-upx-original
 
   - name: executable
     pull: always
