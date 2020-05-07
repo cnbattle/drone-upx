@@ -6,19 +6,16 @@ import (
 	"os/exec"
 )
 
-// Cmd Cmd
+// Cmd exec.Command
 func Cmd(name string, arg ...string) {
-	fmt.Println(name, arg)
-	cmd0 := exec.Command(name, arg...)
-	var outputBuf1 bytes.Buffer
-	cmd0.Stdout = &outputBuf1
-	if err := cmd0.Start(); err != nil {
-		fmt.Printf("Error: The first command can not be startup %s\n", err)
-		return
+	command := exec.Command(name, arg...)
+	var buffer bytes.Buffer
+	command.Stdout = &buffer
+	if err := command.Start(); err != nil {
+		panic(fmt.Sprintf("Error: The first command can not be startup %s\n", err))
 	}
-	if err := cmd0.Wait(); err != nil {
-		fmt.Printf("Error: Couldn't wait for the second command: %s\n", err)
-		return
+	if err := command.Wait(); err != nil {
+		panic(fmt.Sprintf("Error: Couldn't wait for the second command: %s\n", err))
 	}
-	fmt.Printf("%s\n", outputBuf1.Bytes())
+	fmt.Printf("%s", buffer.Bytes())
 }
