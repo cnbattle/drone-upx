@@ -6,11 +6,12 @@
 [![GoDoc](https://godoc.org/github.com/cnbattle/drone-upx?status.svg)](https://godoc.org/github.com/cnbattle/drone-upx)
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg?style=flat-square)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
+## Use
 ```
   - name : upx
     image: cnbattle/drone-upx
     settings:
-      level: 9
-      save_file: ./server_upx
-      original_file: ./server_original
+      level: 9 //default 5
+      save_file: ./executable_upx_file
+      original_file: ./executable_original_file
 ```
