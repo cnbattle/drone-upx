@@ -7,15 +7,19 @@ import (
 )
 
 // Cmd exec.Command
-func Cmd(name string, arg ...string) {
+func Cmd(name string, arg ...string) error {
 	command := exec.Command(name, arg...)
 	var buffer bytes.Buffer
 	command.Stdout = &buffer
 	if err := command.Start(); err != nil {
-		panic(fmt.Sprintf("Error: The first command can not be startup %s\n", err))
+		return err
 	}
 	if err := command.Wait(); err != nil {
-		panic(fmt.Sprintf("Error: Couldn't wait for the second command: %s\n", err))
+		return err
 	}
 	fmt.Printf("%s", buffer.Bytes())
+	fmt.Println("===================================================")
+	fmt.Println("                Successfully                       ")
+	fmt.Println("===================================================")
+	return nil
 }
