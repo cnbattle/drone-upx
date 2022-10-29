@@ -35,21 +35,21 @@ vet:
 
 lint:
 	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/mgechev/revive; \
+		$(GO) install github.com/mgechev/revive@latest; \
 	fi
 	revive -config .revive.toml ./... || exit 1
 
 .PHONY: misspell-check
 misspell-check:
 	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/client9/misspell/cmd/misspell; \
+		$(GO) install github.com/client9/misspell/cmd/misspell@latest; \
 	fi
 	misspell -error $(SOURCES)
 
 .PHONY: misspell
 misspell:
 	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/client9/misspell/cmd/misspell; \
+		$(GO) install github.com/client9/misspell/cmd/misspell@latest; \
 	fi
 	misspell -w $(SOURCES)
 
@@ -80,7 +80,7 @@ release-dirs:
 
 release-build:
 	@which gox > /dev/null; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/mitchellh/gox; \
+		$(GO) install github.com/mitchellh/gox@latest; \
 	fi
 	gox -os="$(TARGETS)" -arch="$(ARCHS)" -tags="$(TAGS)" -ldflags="-s -w $(LDFLAGS)" -output="$(DIST)/binaries/$(EXECUTABLE)-$(VERSION)-{{.OS}}-{{.Arch}}"
 

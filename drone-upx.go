@@ -1,10 +1,12 @@
+// Package cmd main
 package main
 
 import (
 	"errors"
-	"github.com/cnbattle/drone-upx/cmd"
 	"log"
 	"os"
+
+	"github.com/cnbattle/drone-upx/cmd"
 
 	"github.com/urfave/cli/v2"
 )
