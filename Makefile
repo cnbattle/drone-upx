@@ -7,7 +7,7 @@ GO ?= go
 DEPLOY_ACCOUNT := cnbattle
 DEPLOY_IMAGE := $(EXECUTABLE)
 
-TARGETS ?= linux darwin windows
+TARGETS ?= linux windows
 ARCHS ?= amd64 386
 SOURCES ?= $(shell find . -name "*.go" -type f)
 TAGS ?=
